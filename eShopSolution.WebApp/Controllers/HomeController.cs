@@ -22,9 +22,14 @@ namespace eShopSolution.WebApp.Controllers
         {
             return View();
         }
-
         public IActionResult Privacy()
         {
+            return View();
+        }
+        [HttpGet("Home/Privacy/{id}")]
+        public IActionResult Privacy([FromRoute]int id)
+        {
+            ViewData["s"] = "Tham số truyền vào " + id;
             return View();
         }
 
