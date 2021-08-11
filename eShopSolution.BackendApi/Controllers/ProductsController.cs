@@ -1,11 +1,11 @@
 ﻿using eShopSolution.Application.Catalog.Products;
 using eShopSolution.ViewModels.Catalog.ProductImages;
 using eShopSolution.ViewModels.Catalog.Products;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -14,7 +14,6 @@ namespace eShopSolution.BackendApi.Controllers
     //api/products
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly IPublicProductService _publicProductService;
@@ -74,20 +73,20 @@ namespace eShopSolution.BackendApi.Controllers
             return Ok();
         }
 
-        [HttpDelete("{produtcId}")]
-        public async Task<IActionResult> Delete(int produtcId)
+        [HttpDelete("{productId}")]
+        public async Task<IActionResult> Delete(int productId)
         {
-            var affectedResult = await _manageProductService.Delete(produtcId);
+            var affectedResult = await _manageProductService.Delete(productId);
             if (affectedResult == 0)
                 return BadRequest();
 
             return Ok();
         }
 
-        [HttpPatch("{produtcId}/{newPrice}")]
-        public async Task<IActionResult> UpdatePrice(int produtcId, decimal newPrice)
+        [HttpPatch("{productId}/{newPrice}")]
+        public async Task<IActionResult> UpdatePrice(int productId, decimal newPrice)
         {
-            var isSuccessful = await _manageProductService.UpdatePrice(produtcId, newPrice);
+            var isSuccessful = await _manageProductService.UpdatePrice(productId, newPrice);
             if (isSuccessful)
                 return Ok();
 

@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace eShopSolution.BackendApi
+namespace eShopSolution.AdminApp
 {
     public class Program
     {
