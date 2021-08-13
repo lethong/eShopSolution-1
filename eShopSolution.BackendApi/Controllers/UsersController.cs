@@ -1,6 +1,7 @@
 ﻿using eShopSolution.Application.System.Users;
 using eShopSolution.ViewModels.System.Users;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
@@ -12,6 +13,7 @@ namespace eShopSolution.BackendApi.Controllers
     //api/users
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UsersController : Controller
     {
         private readonly IUserService _userService;
@@ -49,6 +51,14 @@ namespace eShopSolution.BackendApi.Controllers
                 return BadRequest("Register is unsuccessful");
             }
             return Ok();
+        }
+
+        //http://localhost/api/users/paging?pageIndex=1&pageSize=10&keyword=
+        [HttpGet("paging")]
+        public async Task<IActionResult> GetAllPaging([FromQuery] GetUserPagingRequest request)
+        {
+            var users = await _userService.GetUsersPaging(request);
+            return Ok(users);
         }
     }
 }
