@@ -42,6 +42,12 @@ namespace eShopSolution.AdminApp.Controllers
             return View(data.ResultObj);
         }
 
+        [HttpGet]
+        public IActionResult Create()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> Create(RegisterRequest request)
         {
