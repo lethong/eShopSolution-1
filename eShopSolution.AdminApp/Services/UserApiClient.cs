@@ -134,6 +134,30 @@ namespace eShopSolution.AdminApp.Services
             }
         }
 
+        public async Task<ApiResult<bool>> RoleAssign(Guid id, RoleAssignRequest request)
+        {
+            using (var client = new HttpClient())
+            {
+                var sessions = _httpContextAccessor.HttpContext.Session.GetString("Token");
+                var requestJSON = JsonConvert.SerializeObject(request);
+                var buffer = Encoding.UTF8.GetBytes(requestJSON);
+                var byteContent = new ByteArrayContent(buffer);
+                byteContent.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+                client.BaseAddress = new Uri(_configuration["BaseAddress"]);
+                client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", sessions);
+                var response = await client.PutAsync($"/api/users/{id}/roles", byteContent);
+                var result = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    return JsonConvert.DeserializeObject<ApiSuccessResult<bool>>(result);
+                }
+                else
+                {
+                    return JsonConvert.DeserializeObject<ApiErrorResult<bool>>(result);
+                }
+            }
+        }
+
         public async Task<ApiResult<bool>> UpdateUser(Guid id, UserUpdateRequest request)
         {
             using (var client = new HttpClient())
