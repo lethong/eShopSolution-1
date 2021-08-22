@@ -1,5 +1,5 @@
 ﻿using eShopSolution.ViewModels.Common;
-using eShopSolution.ViewModels.System.Roles;
+using eShopSolution.ViewModels.System.Languages;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
@@ -12,16 +12,16 @@ using System.Threading.Tasks;
 
 namespace eShopSolution.AdminApp.Services
 {
-    public class RoleApiClient : BaseApiClient, IRoleApiClient
+    public class LanguageApiClient : BaseApiClient, ILanguageApiClient
     {
-        public RoleApiClient(IHttpClientFactory httpClientFactory, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
+        public LanguageApiClient(IHttpClientFactory httpClientFactory, IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
             : base(httpClientFactory, configuration, httpContextAccessor)
         {
         }
 
-        public async Task<ApiResult<List<RoleViewModel>>> GetAll()
+        public async Task<ApiResult<List<LanguageViewModel>>> GetAll()
         {
-            return await GetAsync<ApiResult<List<RoleViewModel>>>($"/api/roles");
+            return await GetAsync<ApiResult<List<LanguageViewModel>>>("/api/languages");
         }
     }
 }
