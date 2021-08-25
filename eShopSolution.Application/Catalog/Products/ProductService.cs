@@ -167,13 +167,16 @@ namespace eShopSolution.Application.Catalog.Products
             // 1.Select join
             var query = from p in _context.Products
                         join pt in _context.ProductTranslations on p.Id equals pt.ProductId
-                        join pic in _context.ProductInCategories on p.Id equals pic.ProductId
-                        join c in _context.Categories on pic.CategoryId equals c.Id
-                        select new { p, pt, pic };
+                        join pic in _context.ProductInCategories on p.Id equals pic.ProductId into tmppic
+                        from picOrNull in tmppic.DefaultIfEmpty()
+                        join c in _context.Categories on picOrNull.CategoryId equals c.Id into tmpc
+                        from cOrNull in tmpc.DefaultIfEmpty()
+                        where pt.LanguageId == request.LanguageId
+                        select new { p, pt, pic = picOrNull }; //
             // 2.Filter
             if (!string.IsNullOrEmpty(request.Keyword))
                 query = query.Where(x => x.pt.Name.Contains(request.Keyword));
-            if (request.CatagoryIds.Count > 0)
+            if (request.CatagoryIds != null && request.CatagoryIds.Count > 0)
             {
                 query = query.Where(p => request.CatagoryIds.Contains(p.pic.CategoryId));
             }
