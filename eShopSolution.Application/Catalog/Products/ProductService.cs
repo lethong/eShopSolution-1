@@ -176,9 +176,9 @@ namespace eShopSolution.Application.Catalog.Products
             // 2.Filter
             if (!string.IsNullOrEmpty(request.Keyword))
                 query = query.Where(x => x.pt.Name.Contains(request.Keyword));
-            if (request.CatagoryIds != null && request.CatagoryIds.Count > 0)
+            if (request.CategoryId.HasValue && request.CategoryId > 0)
             {
-                query = query.Where(p => request.CatagoryIds.Contains(p.pic.CategoryId));
+                query = query.Where(p => p.pic.CategoryId == request.CategoryId);
             }
             // 3.Paging
             int totalRow = await query.CountAsync();
