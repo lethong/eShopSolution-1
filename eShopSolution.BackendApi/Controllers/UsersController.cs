@@ -68,7 +68,7 @@ namespace eShopSolution.BackendApi.Controllers
             return Ok(result);
         }
 
-        //https://localhost/api/id/roles
+        //https://localhost/api/uses/id/roles
         [HttpPut("{id}/roles")]
         public async Task<IActionResult> RoleAssign(Guid id, [FromBody] RoleAssignRequest request)
         {

@@ -127,6 +127,12 @@ namespace eShopSolution.Application.Catalog.Products
             var product = await _context.Products.FindAsync(productId);
             var productTranslation = await _context.ProductTranslations.FirstOrDefaultAsync(x => x.ProductId == productId && x.LanguageId == languageId);
 
+            var categories = await (from c in _context.Categories
+                                    join ct in _context.CategoryTranslations on c.Id equals ct.CategoryId
+                                    join pic in _context.ProductInCategories on c.Id equals pic.CategoryId
+                                    where pic.ProductId == productId && ct.LanguageId == languageId
+                                    select ct.Name).ToListAsync();
+
             var productViewModel = new ProductViewModel()
             {
                 Id = product.Id,
@@ -141,7 +147,8 @@ namespace eShopSolution.Application.Catalog.Products
                 Details = productTranslation != null ? productTranslation.Details : null,
                 SeoAlias = productTranslation != null ? productTranslation.SeoAlias : null,
                 SeoDescription = productTranslation != null ? productTranslation.SeoDescription : null,
-                SeoTitle = productTranslation != null ? productTranslation.SeoTitle : null
+                SeoTitle = productTranslation != null ? productTranslation.SeoTitle : null,
+                Categories = categories
             };
             return productViewModel;
         }
@@ -168,11 +175,12 @@ namespace eShopSolution.Application.Catalog.Products
             var query = from p in _context.Products
                         join pt in _context.ProductTranslations on p.Id equals pt.ProductId
                         join pic in _context.ProductInCategories on p.Id equals pic.ProductId into tmppic
-                        from picOrNull in tmppic.DefaultIfEmpty()
-                        join c in _context.Categories on picOrNull.CategoryId equals c.Id into tmpc
-                        from cOrNull in tmpc.DefaultIfEmpty()
+                        from pic in tmppic.DefaultIfEmpty()
+                        join c in _context.Categories on pic.CategoryId equals c.Id into tmpc
+                        from c in tmpc.DefaultIfEmpty()
                         where pt.LanguageId == request.LanguageId
-                        select new { p, pt, pic = picOrNull }; //
+                        select new { p, pt, pic };
+
             // 2.Filter
             if (!string.IsNullOrEmpty(request.Keyword))
                 query = query.Where(x => x.pt.Name.Contains(request.Keyword));
@@ -343,6 +351,33 @@ namespace eShopSolution.Application.Catalog.Products
                 Items = data
             };
             return PageResult;
+        }
+
+        public async Task<ApiResult<bool>> CategoryAssign(int id, CategoryAssignRequest request)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+            {
+                return new ApiErrorResult<bool>($"Sản phẩm với id {id} không tồn tại");
+            }
+            foreach (var category in request.Categories)
+            {
+                var productInCategory = await _context.ProductInCategories.FirstOrDefaultAsync(x => x.CategoryId == int.Parse(category.Id) && x.ProductId == id);
+                if (productInCategory != null && category.Selected == false)
+                {
+                    _context.ProductInCategories.Remove(productInCategory);
+                }
+                else if (productInCategory == null && category.Selected == true)
+                {
+                    await _context.ProductInCategories.AddAsync(new ProductInCategory()
+                    {
+                        ProductId = id,
+                        CategoryId = int.Parse(category.Id)
+                    });
+                }
+            }
+            await _context.SaveChangesAsync();
+            return new ApiSuccessResult<bool>();
         }
     }
 }
