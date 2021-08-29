@@ -207,7 +207,8 @@ namespace eShopSolution.Application.Catalog.Products
                     ViewCount = x.p.ViewCount,
                     SeoAlias = x.pt.SeoAlias,
                     SeoDescription = x.pt.SeoDescription,
-                    SeoTitle = x.pt.SeoTitle
+                    SeoTitle = x.pt.SeoTitle//,
+                    //Categories = from
                 }).ToListAsync();
 
             // 4.Select and Projection

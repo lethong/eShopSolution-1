@@ -89,6 +89,9 @@
                                 <td>
                                     @Html.DisplayFor(modelItem => item.Stock)
                                 </td>
+                                @*<td>
+                                        @Html.DisplayFor(modelItem => string.Join(", ", item.Categories))
+                                    </td>*@
                                 <td>
                                     @Html.ActionLink("Sửa", "Edit", new { id = item.Id }) |
                                     @Html.ActionLink("Xem", "Details", new { id = item.Id }) |
