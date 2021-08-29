@@ -6,6 +6,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using eShopSolution.WebApp.Models;
+using Microsoft.AspNetCore.Localization;
+using Microsoft.AspNetCore.Http;
 
 namespace eShopSolution.WebApp.Controllers
 {
@@ -22,12 +24,14 @@ namespace eShopSolution.WebApp.Controllers
         {
             return View();
         }
+
         public IActionResult Privacy()
         {
             return View();
         }
+
         [HttpGet("Home/Privacy/{id}")]
-        public IActionResult Privacy([FromRoute]int id)
+        public IActionResult Privacy([FromRoute] int id)
         {
             ViewData["s"] = "Tham số truyền vào " + id;
             return View();
@@ -37,6 +41,17 @@ namespace eShopSolution.WebApp.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        public IActionResult SetCultureCookie(string cltr, string returnUrl)
+        {
+            Response.Cookies.Append(
+                CookieRequestCultureProvider.DefaultCookieName,
+                CookieRequestCultureProvider.MakeCookieValue(new RequestCulture(cltr)),
+                new CookieOptions { Expires = DateTimeOffset.UtcNow.AddYears(1) }
+            );
+
+            return LocalRedirect(returnUrl);
         }
     }
 }
