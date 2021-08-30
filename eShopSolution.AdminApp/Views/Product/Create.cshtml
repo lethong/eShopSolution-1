@@ -8,16 +8,11 @@
     <script src="/js/ckeditor.js"></script>
     <script>
         ClassicEditor
-            .create(document.querySelector('#txt_details'), {
-                // toolbar: [ 'heading', '|', 'bold', 'italic', 'link' ]
-            })
-            .then(editor => {
-                window.editor = editor;
-
-            })
-            .catch(err => {
-                console.error(err.stack);
-            });
+            .create(document.querySelector('#txt_details'),
+                {
+                    ckfinder: { uploadUrl: '/UploadImage/OnPostUploadImage' }
+                })
+            .catch(error => { console.error(error); });
     </script>
 }
 <div class="container-fluid px-4">

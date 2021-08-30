@@ -19,4 +19,8 @@
     <ProjectReference Include="..\eShopSolution.ViewModels\eShopSolution.ViewModels.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="wwwroot\CKEditorImages\" />
+  </ItemGroup>
+
 </Project>
