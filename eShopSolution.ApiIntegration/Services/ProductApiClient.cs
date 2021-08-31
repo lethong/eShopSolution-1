@@ -4,6 +4,7 @@ using eShopSolution.ViewModels.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Net.Http.Headers;
@@ -70,6 +71,11 @@ namespace eShopSolution.ApiIntegration.Services
         public async Task<ProductViewModel> GetById(int id, string languageId)
         {
             return await GetAsync<ProductViewModel>($"/api/products/{id}/{languageId}");
+        }
+
+        public async Task<List<ProductViewModel>> GetFeaturedProducts(string languageId, int take)
+        {
+            return await GetAsync<List<ProductViewModel>>($"/api/products/featured/{take}/{languageId}");
         }
 
         public async Task<PagedResult<ProductViewModel>> GetPagings(GetManageProductPagingRequest request)

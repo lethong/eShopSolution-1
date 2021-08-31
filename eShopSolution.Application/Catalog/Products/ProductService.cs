@@ -380,5 +380,39 @@ namespace eShopSolution.Application.Catalog.Products
             await _context.SaveChangesAsync();
             return new ApiSuccessResult<bool>();
         }
+
+        public async Task<List<ProductViewModel>> GetFeaturedProducts(string languageId, int take)
+        {
+            // 1.Select join
+            var query = from p in _context.Products
+                            //join pi in _context.ProductImages.Where(x => x.IsDefault == true) on p.Id equals pi.ProductId
+                        join pt in _context.ProductTranslations on p.Id equals pt.ProductId
+                        join pic in _context.ProductInCategories on p.Id equals pic.ProductId into tmppic
+                        from pic in tmppic.DefaultIfEmpty()
+                        join c in _context.Categories on pic.CategoryId equals c.Id into tmpc
+                        from c in tmpc.DefaultIfEmpty()
+                        where pt.LanguageId == languageId
+                        select new { p, pt, pic };
+
+            var data = await query.OrderByDescending(x => x.p.DateCreated).Take(take).Select(x => new ProductViewModel()
+            {
+                Id = x.p.Id,
+                Name = x.pt.Name,
+                DateCreated = x.p.DateCreated,
+                Description = x.pt.Description,
+                Details = x.pt.Details,
+                LanguageId = x.pt.LanguageId,
+                Price = x.p.Price,
+                OriginalPrice = x.p.OriginalPrice,
+                Stock = x.p.Stock,
+                ViewCount = x.p.ViewCount,
+                SeoAlias = x.pt.SeoAlias,
+                SeoDescription = x.pt.SeoDescription,
+                SeoTitle = x.pt.SeoTitle,
+                ThumbnailImage = "https://localhost:5001/user-content/2fbadffa-de4f-4227-81d8-72be5e7bdeb9.jpg"
+            }).ToListAsync();
+
+            return data;
+        }
     }
 }

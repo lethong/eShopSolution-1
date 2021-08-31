@@ -1,6 +1,7 @@
 ﻿using eShopSolution.Application.Catalog.Products;
 using eShopSolution.ViewModels.Catalog.ProductImages;
 using eShopSolution.ViewModels.Catalog.Products;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
@@ -14,6 +15,7 @@ namespace eShopSolution.BackendApi.Controllers
     //api/products
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -46,6 +48,17 @@ namespace eShopSolution.BackendApi.Controllers
             if (product == null)
                 return BadRequest("Can not find product");
             return Ok(product);
+        }
+
+        //http://localhost:port/products/{productId}/{languageId}
+        [HttpGet("featured/{take}/{languageId}")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetFeaturedProducts(int take, string languageId)
+        {
+            var products = await _productService.GetFeaturedProducts(languageId, take);
+            if (products == null)
+                return BadRequest("Can not find list featured products");
+            return Ok(products);
         }
 
         [HttpPost]
