@@ -22,6 +22,7 @@ namespace eShopSolution.BackendApi.Controllers
         }
 
         [HttpGet]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAll(string languageId)
         {
             var categories = await _categoryService.GetAll(languageId);

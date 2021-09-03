@@ -30,7 +30,8 @@ namespace eShopSolution.Application.Catalog.Categories
             {
                 Id = x.c.Id,
                 Name = x.ct.Name,
-                LanguageId = languageId
+                LanguageId = languageId,
+                ParentId = x.c.ParentId
             }).ToListAsync();
             return data;
         }

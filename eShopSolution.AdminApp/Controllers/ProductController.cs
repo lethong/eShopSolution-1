@@ -59,6 +59,7 @@ namespace eShopSolution.AdminApp.Controllers
         }
 
         [HttpPost]
+        [Consumes("multipart/form-data")]
         public async Task<IActionResult> Create([FromForm] ProductCreateRequest request)
         {
             if (!ModelState.IsValid)
@@ -71,6 +72,42 @@ namespace eShopSolution.AdminApp.Controllers
             }
 
             ModelState.AddModelError("", "Thêm sản phẩm thất bại");
+            return View(request);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Edit(int id)
+        {
+            var languageId = HttpContext.Session.GetString(SystemConstants.AppSettings.DefaultLanguageId);
+            var product = await _productApiClient.GetById(id, languageId);
+            var productUpdateRequest = new ProductUpdateRequest()
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Details = product.Details,
+                SeoTitle = product.SeoTitle,
+                SeoAlias = product.SeoAlias,
+                SeoDescription = product.SeoDescription,
+                IsFeatured = product.IsFeatured
+            };
+            return View(productUpdateRequest);
+        }
+
+        [HttpPost]
+        [Consumes("multipart/form-data")]
+        public async Task<IActionResult> Edit([FromForm] ProductUpdateRequest request)
+        {
+            if (!ModelState.IsValid)
+                return View(request);
+            var result = await _productApiClient.UpdateProduct(request);
+            if (result)
+            {
+                TempData["result"] = "Cập nhật sản phẩm thành công";
+                return RedirectToAction("Index");
+            }
+
+            ModelState.AddModelError("", "Cập nhật sản phẩm thất bại");
             return View(request);
         }
 

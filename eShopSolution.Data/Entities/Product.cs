@@ -12,7 +12,7 @@ namespace eShopSolution.Data.Entities
         public decimal OriginalPrice { set; get; }
         public int Stock { set; get; }
         public int ViewCount { set; get; }
-        public bool? IsFeatured { get; set; }
+        public bool IsFeatured { get; set; }
         public DateTime DateCreated { set; get; }
 
         public List<ProductInCategory> ProductInCategories { get; set; }
