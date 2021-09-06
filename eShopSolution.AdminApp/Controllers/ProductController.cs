@@ -112,6 +112,28 @@ namespace eShopSolution.AdminApp.Controllers
         }
 
         [HttpGet]
+        public IActionResult Delete(int id)
+        {
+            return View(new ProductDeleteRequest() { Id = id });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Delete(ProductDeleteRequest request)
+        {
+            if (!ModelState.IsValid)
+                return View();
+            var result = await _productApiClient.DeleteProduct(request.Id);
+            if (result)
+            {
+                TempData["result"] = "Xóa sản phẩm thành công";
+                return RedirectToAction("Index");
+            }
+
+            ModelState.AddModelError("", "Xóa sản phẩm thất bại");
+            return View(request);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> CategoryAssign(int id)
         {
             var categoryAssignRequest = await GetCategoryAssignRequest(id);
@@ -147,7 +169,7 @@ namespace eShopSolution.AdminApp.Controllers
                 {
                     Id = category.Id.ToString(),
                     Name = category.Name,
-                    Selected = productObj.Categories.Contains(category.Name)
+                    Selected = productObj.Categories.Count(x => x.Name.Contains(category.Name)) > 0
                 });
             }
             return categoryAssignRequest;

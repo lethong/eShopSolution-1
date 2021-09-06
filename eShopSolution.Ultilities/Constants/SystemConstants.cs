@@ -24,7 +24,6 @@ namespace eShopSolution.Ultilities.Constants
         public class ProductConstants
         {
             public const string NA = "N/A";
-            public const string BasePathImage = "https://localhost:5001/user-content/";
         }
     }
 }

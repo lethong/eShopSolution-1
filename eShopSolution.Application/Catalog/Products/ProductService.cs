@@ -15,6 +15,7 @@ using System.IO;
 using eShopSolution.Application.Common;
 using eShopSolution.ViewModels.Catalog.ProductImages;
 using eShopSolution.Ultilities.Constants;
+using eShopSolution.ViewModels.Catalog.Categories;
 
 namespace eShopSolution.Application.Catalog.Products
 {
@@ -160,12 +161,19 @@ namespace eShopSolution.Application.Catalog.Products
         {
             var product = await _context.Products.FindAsync(productId);
             var productTranslation = await _context.ProductTranslations.FirstOrDefaultAsync(x => x.ProductId == productId && x.LanguageId == languageId);
-
-            var categories = await (from c in _context.Categories
-                                    join ct in _context.CategoryTranslations on c.Id equals ct.CategoryId
-                                    join pic in _context.ProductInCategories on c.Id equals pic.CategoryId
-                                    where pic.ProductId == productId && ct.LanguageId == languageId
-                                    select ct.Name).ToListAsync();
+            var productImage = await _context.ProductImages.FirstOrDefaultAsync(x => x.ProductId == productId && x.IsDefault == true);
+            var categoriesquery = from c in _context.Categories
+                                  join ct in _context.CategoryTranslations on c.Id equals ct.CategoryId
+                                  join pic in _context.ProductInCategories on c.Id equals pic.CategoryId
+                                  where pic.ProductId == productId && ct.LanguageId == languageId
+                                  select new { c, ct };
+            var categories = await categoriesquery.Select(x => new CategoryViewModel()
+            {
+                Id = x.c.Id,
+                Name = x.ct.Name,
+                LanguageId = x.ct.LanguageId,
+                ParentId = x.c.ParentId
+            }).ToListAsync();
 
             var productViewModel = new ProductViewModel()
             {
@@ -183,8 +191,10 @@ namespace eShopSolution.Application.Catalog.Products
                 SeoDescription = productTranslation != null ? productTranslation.SeoDescription : null,
                 SeoTitle = productTranslation != null ? productTranslation.SeoTitle : null,
                 IsFeatured = product.IsFeatured,
+                ThumbnailImage = productImage != null ? productImage.ImagePath : "",
                 Categories = categories
             };
+
             return productViewModel;
         }
 
@@ -208,13 +218,15 @@ namespace eShopSolution.Application.Catalog.Products
         {
             // 1.Select join
             var query = from p in _context.Products
+                        join pi in _context.ProductImages on p.Id equals pi.ProductId into tmppi
+                        from pi in tmppi.DefaultIfEmpty()
                         join pt in _context.ProductTranslations on p.Id equals pt.ProductId
                         join pic in _context.ProductInCategories on p.Id equals pic.ProductId into tmppic
                         from pic in tmppic.DefaultIfEmpty()
                         join c in _context.Categories on pic.CategoryId equals c.Id into tmpc
                         from c in tmpc.DefaultIfEmpty()
-                        where pt.LanguageId == request.LanguageId
-                        select new { p, pt, pic };
+                        where pt.LanguageId == request.LanguageId && (pi == null || pi.IsDefault == true)
+                        select new { p, pt, pic, pi };
 
             // 2.Filter
             if (!string.IsNullOrEmpty(request.Keyword))
@@ -242,7 +254,8 @@ namespace eShopSolution.Application.Catalog.Products
                     ViewCount = x.p.ViewCount,
                     SeoAlias = x.pt == null ? SystemConstants.ProductConstants.NA : x.pt.SeoAlias,
                     SeoDescription = x.pt == null ? SystemConstants.ProductConstants.NA : x.pt.SeoDescription,
-                    SeoTitle = x.pt == null ? SystemConstants.ProductConstants.NA : x.pt.SeoTitle
+                    SeoTitle = x.pt == null ? SystemConstants.ProductConstants.NA : x.pt.SeoTitle,
+                    ThumbnailImage = x.pi.ImagePath
                 }).ToListAsync();
 
             // 4.Select and Projection
@@ -444,7 +457,7 @@ namespace eShopSolution.Application.Catalog.Products
                 SeoAlias = x.pt.SeoAlias,
                 SeoDescription = x.pt.SeoDescription,
                 SeoTitle = x.pt.SeoTitle,
-                ThumbnailImage = SystemConstants.ProductConstants.BasePathImage + x.pi.ImagePath
+                ThumbnailImage = x.pi.ImagePath
             }).ToListAsync();
 
             return data;
@@ -479,7 +492,7 @@ namespace eShopSolution.Application.Catalog.Products
                 SeoAlias = x.pt.SeoAlias,
                 SeoDescription = x.pt.SeoDescription,
                 SeoTitle = x.pt.SeoTitle,
-                ThumbnailImage = SystemConstants.ProductConstants.BasePathImage + x.pi.ImagePath
+                ThumbnailImage = x.pi.ImagePath
             }).ToListAsync();
 
             return data;

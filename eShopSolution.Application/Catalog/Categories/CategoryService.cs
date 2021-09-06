@@ -35,5 +35,23 @@ namespace eShopSolution.Application.Catalog.Categories
             }).ToListAsync();
             return data;
         }
+
+        public async Task<CategoryViewModel> GetById(string languageId, int id)
+        {
+            // 1.Select join
+            var query = from c in _context.Categories
+                        join ct in _context.CategoryTranslations on c.Id equals ct.CategoryId
+                        where ct.LanguageId == languageId && c.Id == id
+                        select new { c, ct };
+
+            var data = await query.Select(x => new CategoryViewModel()
+            {
+                Id = x.c.Id,
+                Name = x.ct.Name,
+                LanguageId = languageId,
+                ParentId = x.c.ParentId
+            }).FirstOrDefaultAsync();
+            return data;
+        }
     }
 }

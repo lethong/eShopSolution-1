@@ -1,4 +1,5 @@
-﻿using eShopSolution.ViewModels.Catalog.Products;
+﻿using eShopSolution.Ultilities.Constants;
+using eShopSolution.ViewModels.Catalog.Products;
 using eShopSolution.ViewModels.Ultilities.Slides;
 using System;
 using System.Collections.Generic;

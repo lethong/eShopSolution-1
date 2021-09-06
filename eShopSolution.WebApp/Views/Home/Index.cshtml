@@ -3,6 +3,7 @@
     var culture = CultureInfo.CurrentCulture.Name;
 }
 @inject LazZiya.ExpressLocalization.ISharedCultureLocalizer _loc
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 @{
     ViewData["Title"] = "Home Page";
 }
@@ -64,11 +65,12 @@
                         <ul class="thumbnails">
                             @foreach (var item in featuredProducts[i])
                             {
-                                var url = $"{culture}/{_loc["productUrl"]}/{item.Id}";
+                                var url = $"/{culture}/{_loc["productUrl"]}/{item.Id}";
+                                var imgPath = Configuration["BaseImageAddress"] + item.ThumbnailImage;
                                 <li class="span3">
                                     <div class="thumbnail">
                                         <i class="tag"></i>
-                                        <a href="@url"><img src="@item.ThumbnailImage" alt="@item.Name"></a>
+                                        <a href="@url"><img src="@imgPath" alt="@item.Name"></a>
                                         <div class="caption">
                                             <h5>@item.Name</h5>
                                             <h4><a class="btn" href="@url" localize-content>VIEW</a> <span class="pull-right">@item.Price</span></h4>
@@ -92,10 +94,11 @@
 <ul class="thumbnails">
     @foreach (var item in Model.LatestProducts)
     {
-        var url = $"{culture}/{_loc["productUrl"]}/{item.Id}";
+        var url = $"/{culture}/{_loc["productUrl"]}/{item.Id}";
+        var imgPath = Configuration["BaseImageAddress"] + item.ThumbnailImage;
         <li class="span3">
             <div class="thumbnail">
-                <a href="@url"><img src="@item.ThumbnailImage" alt="@item.Name" /></a>
+                <a href="@url"><img src="@imgPath" alt="@item.Name" /></a>
                 <div class="caption">
                     <h5>@item.Name</h5>
                     <p>
