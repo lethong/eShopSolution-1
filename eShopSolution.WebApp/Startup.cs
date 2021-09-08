@@ -15,6 +15,8 @@ using eShopSolution.WebApp.LocalizationResources;
 using eShopSolution.ApiIntegration.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using FluentValidation.AspNetCore;
+using eShopSolution.ViewModels.System.Users;
 
 namespace eShopSolution.WebApp
 {
@@ -37,6 +39,7 @@ namespace eShopSolution.WebApp
                 new CultureInfo("vi"),
             };
             services.AddControllersWithViews()
+                .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<LoginRequestValidator>())
                 .AddExpressLocalization<ExpressLocalizationResource, ViewLocalizationResource>(ops =>
                 {
                     // When using all the culture providers, the localization process will

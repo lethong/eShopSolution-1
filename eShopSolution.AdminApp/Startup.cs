@@ -33,7 +33,7 @@ namespace eShopSolution.AdminApp
                 options.AccessDeniedPath = "/Account/Forbidden";
             });
 
-            services.AddControllersWithViews().AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<LoginRequestValidator>()); ;
+            services.AddControllersWithViews().AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<LoginRequestValidator>());
 
             services.AddSession(options =>
             {
