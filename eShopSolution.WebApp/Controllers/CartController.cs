@@ -25,6 +25,17 @@ namespace eShopSolution.WebApp.Controllers
             return View();
         }
 
+        [HttpGet]
+        public IActionResult GetListItems()
+        {
+            var session = HttpContext.Session.GetString(SystemConstants.CartSession);
+            List<CartItemViewModel> currentCart = new List<CartItemViewModel>();
+            if (session != null)
+                currentCart = JsonConvert.DeserializeObject<List<CartItemViewModel>>(HttpContext.Session.GetString(SystemConstants.CartSession));
+
+            return Ok(currentCart);
+        }
+
         public async Task<IActionResult> AddToCart(int id, string languageId)
         {
             var product = await _productApiClient.GetById(id, languageId);
@@ -36,18 +47,25 @@ namespace eShopSolution.WebApp.Controllers
             int quantity = 1;
             if (currentCart.Any(x => x.ProductId == id))
             {
-                quantity = currentCart.FirstOrDefault(x => x.ProductId == id).Quantity + 1;
+                var updateItem = currentCart.FirstOrDefault(x => x.ProductId == id);
+                quantity = updateItem.Quantity + 1;
+                updateItem.Quantity = quantity;
             }
-            var cartItem = new CartItemViewModel()
+            else
             {
-                ProductId = id,
-                Description = product.Description,
-                Image = product.ThumbnailImage,
-                Quantity = quantity
-            };
-            currentCart.Add(cartItem);
+                var cartItem = new CartItemViewModel()
+                {
+                    ProductId = id,
+                    Description = product.Description,
+                    Name = product.Name,
+                    Image = product.ThumbnailImage,
+                    Quantity = quantity,
+                    Price = product.Price
+                };
+                currentCart.Add(cartItem);
+            }
             HttpContext.Session.SetString(SystemConstants.CartSession, JsonConvert.SerializeObject(currentCart));
-            return Ok();
+            return Ok(currentCart);
         }
     }
 }
