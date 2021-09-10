@@ -67,5 +67,28 @@ namespace eShopSolution.WebApp.Controllers
             HttpContext.Session.SetString(SystemConstants.CartSession, JsonConvert.SerializeObject(currentCart));
             return Ok(currentCart);
         }
+
+        public IActionResult UpdateCart(int id, int quantity)
+        {
+            var session = HttpContext.Session.GetString(SystemConstants.CartSession);
+            List<CartItemViewModel> currentCart = new List<CartItemViewModel>();
+            if (session != null)
+                currentCart = JsonConvert.DeserializeObject<List<CartItemViewModel>>(HttpContext.Session.GetString(SystemConstants.CartSession));
+
+            foreach (var item in currentCart)
+            {
+                if (item.ProductId == id)
+                {
+                    if (quantity == 0)
+                    {
+                        currentCart.Remove(item);
+                    }
+                    item.Quantity = quantity;
+                    break;
+                }
+            }
+            HttpContext.Session.SetString(SystemConstants.CartSession, JsonConvert.SerializeObject(currentCart));
+            return Ok(currentCart);
+        }
     }
 }
