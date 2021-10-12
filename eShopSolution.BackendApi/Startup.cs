@@ -1,6 +1,7 @@
 using eShopSolution.Application.Catalog.Categories;
 using eShopSolution.Application.Catalog.Products;
 using eShopSolution.Application.Common;
+using eShopSolution.Application.Sales.Orders;
 using eShopSolution.Application.System.Languages;
 using eShopSolution.Application.System.Roles;
 using eShopSolution.Application.System.Users;
@@ -55,6 +56,7 @@ namespace eShopSolution.BackendApi
             services.AddTransient<ICategoryService, CategoryService>();
             services.AddTransient<ILanguageService, LanguageService>();
             services.AddTransient<ISlideService, SlideService>();
+            services.AddTransient<IOrderService, OrderService>();
 
             //services.AddTransient<IValidator<LoginRequest>, LoginRequestValidator>();
             //services.AddTransient<IValidator<RegisterRequest>, RegisterRequestValidator>();

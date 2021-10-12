@@ -238,6 +238,11 @@ namespace eShopSolution.Application.Catalog.Products
             // 3.Paging
             int totalRow = await query.CountAsync();
 
+            var categoriesquery = from c in _context.Categories
+                                  join ct in _context.CategoryTranslations on c.Id equals ct.CategoryId
+                                  join pic in _context.ProductInCategories on c.Id equals pic.CategoryId
+                                  select new { c, ct, pic };
+
             var data = await query.Skip((request.PageIndex - 1) * request.PageSize)
                 .Take(request.PageSize)
                 .Select(x => new ProductViewModel()
@@ -255,7 +260,14 @@ namespace eShopSolution.Application.Catalog.Products
                     SeoAlias = x.pt == null ? SystemConstants.ProductConstants.NA : x.pt.SeoAlias,
                     SeoDescription = x.pt == null ? SystemConstants.ProductConstants.NA : x.pt.SeoDescription,
                     SeoTitle = x.pt == null ? SystemConstants.ProductConstants.NA : x.pt.SeoTitle,
-                    ThumbnailImage = x.pi.ImagePath
+                    ThumbnailImage = x.pi.ImagePath,
+                    Categories = categoriesquery.Where(y => y.pic.ProductId == x.p.Id && y.ct.LanguageId == request.LanguageId).Select(z => new CategoryViewModel()
+                    {
+                        Id = z.c.Id,
+                        Name = z.ct.Name,
+                        LanguageId = z.ct.LanguageId,
+                        ParentId = z.c.ParentId
+                    }).ToList()
                 }).ToListAsync();
 
             // 4.Select and Projection
@@ -435,12 +447,8 @@ namespace eShopSolution.Application.Catalog.Products
                         join pi in _context.ProductImages on p.Id equals pi.ProductId into tmppi
                         from pi in tmppi.DefaultIfEmpty()
                         join pt in _context.ProductTranslations on p.Id equals pt.ProductId
-                        join pic in _context.ProductInCategories on p.Id equals pic.ProductId into tmppic
-                        from pic in tmppic.DefaultIfEmpty()
-                        join c in _context.Categories on pic.CategoryId equals c.Id into tmpc
-                        from c in tmpc.DefaultIfEmpty()
                         where pt.LanguageId == languageId && p.IsFeatured == true && (pi == null || pi.IsDefault == true)
-                        select new { p, pt, pic, pi };
+                        select new { p, pt, pi };
 
             var data = await query.OrderByDescending(x => x.p.DateCreated).Take(take).Select(x => new ProductViewModel()
             {
@@ -470,12 +478,8 @@ namespace eShopSolution.Application.Catalog.Products
                         join pi in _context.ProductImages on p.Id equals pi.ProductId into tmppi
                         from pi in tmppi.DefaultIfEmpty()
                         join pt in _context.ProductTranslations on p.Id equals pt.ProductId
-                        join pic in _context.ProductInCategories on p.Id equals pic.ProductId into tmppic
-                        from pic in tmppic.DefaultIfEmpty()
-                        join c in _context.Categories on pic.CategoryId equals c.Id into tmpc
-                        from c in tmpc.DefaultIfEmpty()
                         where pt.LanguageId == languageId && (pi == null || pi.IsDefault == true)
-                        select new { p, pt, pic, pi };
+                        select new { p, pt, pi };
 
             var data = await query.OrderByDescending(x => x.p.DateCreated).Take(take).Select(x => new ProductViewModel()
             {
