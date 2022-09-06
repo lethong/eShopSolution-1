@@ -143,7 +143,7 @@ namespace eShopSolution.BackendApi
             app.UseRouting();
 
             app.UseAuthorization();
-
+            app.UseCors(builder => builder.WithOrigins("http://127.0.0.1:5500"));
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
 
